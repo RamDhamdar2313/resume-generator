@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
+import React from 'react';
 import { pdf } from '@react-pdf/renderer';
 import Resume from './dist/Resume.js';
 
@@ -112,7 +113,11 @@ async function loadResumeData() {
 }
 
 async function writeResumePdf(resumeData) {
-  const document = pdf(<Resume data={resumeData} />);
+  const document = pdf(
+    React.createElement(Resume, {
+      data: resumeData
+    })
+  );
   await document.toFile(outputPath);
   console.log(`PDF generated at ${outputPath}`);
 }
