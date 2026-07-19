@@ -1,8 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const yaml = require('js-yaml');
-const ReactPDF = require('@react-pdf/renderer');
+import path from 'path';
+import fs from 'fs-extra';
+import yaml from 'js-yaml';
+import { fileURLToPath } from 'url';
+import { pdf } from '@react-pdf/renderer';
+import Resume from './dist/Resume.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const dataDir = path.resolve(__dirname, 'data');
 const outputDir = path.resolve(__dirname, 'output');
 const resumeDataPath = path.join(dataDir, 'resume.yml');
@@ -19,48 +23,58 @@ const defaultResume = `personal_information:
     url: "https://linkedin.com/in/yourprofile"
 
 professional_summary: >
-  Experienced professional with a strong background in ...
+  Proven professional with experience building modern cloud-native platforms.
 
 key_skills:
-  - Skill 1
-  - Skill 2
-  - Skill 3
+  - Cloud Infrastructure
+  - CI/CD Automation
+  - Kubernetes
+  - Infrastructure as Code
 
 tools_technologies:
   cloud:
     - AWS
+    - GCP
     - Azure
   containers:
     - Docker
     - Kubernetes
+    - Helm
   infrastructure_as_code:
     - Terraform
+    - Ansible
   cicd:
     - GitHub Actions
+    - Jenkins
   observability:
     - Prometheus
+    - Grafana
   programming:
     - JavaScript
     - Python
+    - Bash
   operating_systems:
     - Linux
   version_control:
     - Git
+    - GitHub
   databases:
     - PostgreSQL
+    - MySQL
 
 professional_experience:
   - company: "Example Company"
-    location: "City, Country"
+    location: "Remote"
     duration: "2025 – Present"
     responsibilities:
-      - "Implemented ..."
+      - "Designed and automated infrastructure using Terraform and CI/CD pipelines."
+      - "Managed containerized applications on Kubernetes clusters."
 
 projects:
-  - title: "Project Title"
+  - title: "Resume PDF Generator"
     duration: "2025"
     achievements:
-      - "Delivered ..."
+      - "Built a resume generator using React PDF and YAML input."
 
 education:
   - degree: "Bachelor of Science"
@@ -75,42 +89,57 @@ languages: []
 interests: []
 `;
 
-function ensureDirectory(dir) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+function makeSafeString(value, fallback = '') {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+async function ensureAppDirectories() {
+  await fs.ensureDir(dataDir);
+  await fs.ensureDir(outputDir);
+}
+
+async function ensureResumeFile() {
+  const exists = await fs.pathExists(resumeDataPath);
+  if (!exists) {
+    await fs.writeFile(resumeDataPath, defaultResume, 'utf8');
+    console.log('Created default data/resume.yml');
   }
 }
 
-function ensureDataFile() {
-  if (!fs.existsSync(resumeDataPath)) {
-    fs.writeFileSync(resumeDataPath, defaultResume, 'utf8');
+async function loadResumeData() {
+  const content = await fs.readFile(resumeDataPath, 'utf8');
+  return yaml.load(content) ?? {};
+}
+
+async function writeResumePdf(resumeData) {
+  const document = pdf(<Resume data={resumeData} />);
+  await document.toFile(outputPath);
+  console.log(`PDF generated at ${outputPath}`);
+}
+
+async function run() {
+  try {
+    await ensureAppDirectories();
+    await ensureResumeFile();
+    const rawData = await loadResumeData();
+    const resumeData = {
+      personal_information: rawData.personal_information ?? {},
+      professional_summary: makeSafeString(rawData.professional_summary, ''),
+      key_skills: Array.isArray(rawData.key_skills) ? rawData.key_skills : [],
+      tools_technologies: rawData.tools_technologies ?? {},
+      professional_experience: Array.isArray(rawData.professional_experience) ? rawData.professional_experience : [],
+      projects: Array.isArray(rawData.projects) ? rawData.projects : [],
+      education: Array.isArray(rawData.education) ? rawData.education : [],
+      certifications: Array.isArray(rawData.certifications) ? rawData.certifications : [],
+      languages: Array.isArray(rawData.languages) ? rawData.languages : [],
+      interests: Array.isArray(rawData.interests) ? rawData.interests : []
+    };
+
+    await writeResumePdf(resumeData);
+  } catch (error) {
+    console.error('Resume generation failed:', error.message ?? error);
+    process.exit(1);
   }
 }
 
-ensureDirectory(dataDir);
-ensureDirectory(outputDir);
-ensureDataFile();
-
-const data = yaml.load(fs.readFileSync(resumeDataPath, 'utf8'));
-
-require('@babel/register')({
-  presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }]],
-  extensions: ['.js', '.jsx']
-});
-
-const Resume = require('./src/Resume.jsx').default;
-
-const element = ReactPDF.createElement(Resume, { data });
-const pdf = ReactPDF.renderToStream(element);
-
-const writeStream = fs.createWriteStream(outputPath);
-pdf.pipe(writeStream);
-
-writeStream.on('finish', () => {
-  console.log(`PDF created at ${outputPath}`);
-});
-
-writeStream.on('error', (error) => {
-  console.error('Failed to write PDF:', error);
-  process.exit(1);
-});
+run();

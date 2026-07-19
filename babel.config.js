@@ -1,11 +1,12 @@
-module.exports = {
+export default {
   presets: [
     [
       '@babel/preset-env',
       {
         targets: {
-          node: '18'
-        }
+          node: '22'
+        },
+        modules: false
       }
     ],
     ['@babel/preset-react', { runtime: 'automatic' }]

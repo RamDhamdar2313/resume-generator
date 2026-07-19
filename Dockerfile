@@ -1,10 +1,13 @@
-FROM node:18-alpine
+FROM node:22-bookworm-slim
 
 WORKDIR /app
 
-COPY package.json babel.config.js ./
-RUN npm install --production --ignore-scripts
+COPY package*.json ./
+RUN npm install
 
 COPY . .
+RUN mkdir -p /app/data /app/output
 
-CMD ["node", "generate.js"]
+VOLUME ["/app/data", "/app/output"]
+
+CMD ["npm", "run", "generate"]

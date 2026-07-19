@@ -2,23 +2,27 @@
   "name": "resume-generator",
   "version": "1.0.0",
   "description": "Generate a PDF resume from YAML using React PDF.",
+  "type": "module",
   "main": "generate.js",
-  "type": "commonjs",
   "scripts": {
-    "generate": "node generate.js"
+    "build": "babel src --extensions \".js,.jsx\" --out-dir dist --copy-files --config-file ./babel.config.js",
+    "generate": "npm run build && node generate.js",
+    "start": "npm run generate"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.0.0",
+    "fs-extra": "^11.1.1",
     "js-yaml": "^4.1.0",
-    "react": "^18.3.1"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.24.0",
     "@babel/core": "^7.24.0",
     "@babel/preset-env": "^7.24.0",
-    "@babel/preset-react": "^7.24.0",
-    "@babel/register": "^7.24.0"
+    "@babel/preset-react": "^7.24.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   }
 }

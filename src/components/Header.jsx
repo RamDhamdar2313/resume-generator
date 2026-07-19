@@ -22,20 +22,22 @@ const styles = StyleSheet.create({
   }
 });
 
-export default function Header({ personalInformation, summary }) {
+export default function Header({ personalInformation = {}, summary = '' }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>{personalInformation.full_name}</Text>
-      <Text style={styles.title}>{personalInformation.title}</Text>
+      <Text style={styles.name}>{personalInformation.full_name || 'Your Name'}</Text>
+      <Text style={styles.title}>{personalInformation.title || 'Professional Title'}</Text>
       <Text style={styles.contact}>
-        {personalInformation.location} • {personalInformation.phone} • {personalInformation.email}
+        {[personalInformation.location, personalInformation.phone, personalInformation.email]
+          .filter(Boolean)
+          .join(' • ')}
       </Text>
       {personalInformation.linkedin?.url ? (
         <Text style={styles.contact}>
-          <Link src={personalInformation.linkedin.url}>{personalInformation.linkedin.text}</Link>
+          <Link src={personalInformation.linkedin.url}>{personalInformation.linkedin.text || personalInformation.linkedin.url}</Link>
         </Text>
       ) : null}
-      <Text style={[styles.contact, { marginTop: 8 }]}>{summary}</Text>
+      {summary ? <Text style={[styles.contact, { marginTop: 8 }]}>{summary}</Text> : null}
     </View>
   );
 }

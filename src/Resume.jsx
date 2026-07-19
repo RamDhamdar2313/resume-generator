@@ -1,23 +1,13 @@
 import React from 'react';
-import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer';
-import Header from './components/Header';
-import Section from './components/Section';
-import Experience from './components/Experience';
-import Project from './components/Project';
-import Education from './components/Education';
-import Skills from './components/Skills';
-import Tools from './components/Tools';
-
-const styles = StyleSheet.create({
-  page: {
-    padding: 24,
-    fontSize: 10,
-    fontFamily: 'Helvetica'
-  },
-  section: {
-    marginBottom: 10
-  }
-});
+import { Document, Page, View } from '@react-pdf/renderer';
+import Header from './components/Header.js';
+import Section from './components/Section.js';
+import Experience from './components/Experience.js';
+import Projects from './components/Projects.js';
+import Education from './components/Education.js';
+import Skills from './components/Skills.js';
+import Tools from './components/Tools.js';
+import styles from './styles.js';
 
 export default function Resume({ data }) {
   return (
@@ -37,20 +27,20 @@ export default function Resume({ data }) {
           </Section>
         </View>
 
-        <View style={styles.section}>
-          <Section title="Professional Experience">
-            {data.professional_experience?.map((item, index) => (
-              <Experience key={index} experience={item} />
-            ))}
-          </Section>
-        </View>
+        {data.professional_experience?.length ? (
+          <View style={styles.section}>
+            <Section title="Professional Experience">
+              {data.professional_experience.map((item, index) => (
+                <Experience key={index} experience={item} />
+              ))}
+            </Section>
+          </View>
+        ) : null}
 
         {data.projects?.length ? (
           <View style={styles.section}>
             <Section title="Projects">
-              {data.projects.map((project, index) => (
-                <Project key={index} project={project} />
-              ))}
+              <Projects items={data.projects} />
             </Section>
           </View>
         ) : null}
