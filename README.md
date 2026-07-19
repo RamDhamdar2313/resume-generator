@@ -1,513 +1,96 @@
+# Resume Generator — Usage Guide
 
+This repository generates a PDF resume from a YAML file using `@react-pdf/renderer`.
 
----
-
-# Prompt for Codex
-
-I accidentally lost my entire project. I want you to recreate it from scratch as a **production-quality project**.
-
-## Goal
-
-Create a Resume Generator that:
-
-* uses **React** for the PDF template (`@react-pdf/renderer`)
-* uses **Node.js** to generate the PDF
-* reads data from a YAML file
-* automatically generates a PDF
-* works perfectly inside Docker
-* is designed to be used mostly with a mounted volume of the container created using the Dockerfile
-* automatically creates required folders/files if they don't exist
-* produces a professional ATS-friendly resume matching the attached reference image.
-
----
-
-# Folder Structure
-
-Create the following structure.
-
-```text
-resume-generator/
-│
-├── src/
-│   ├── Resume.jsx
-│   ├── components/
-│   │      Header.jsx
-│   │      Section.jsx
-│   │      Experience.jsx
-│   │      Project.jsx
-│   │      Education.jsx
-│   │      Skills.jsx
-│   │      Tools.jsx
-│   │
-│   └── styles.js
-│
-├── data/
-│   └── resume.yml
-│
-├── output/
-│   └── resume.pdf
-│
-├── generate.js
-├── package.json
-├── babel.config.js
-├── Dockerfile
-├── .dockerignore
-├── .gitignore
-├── README.md
-```
-
----
-
-# Automatic Folder Creation
-
-Whenever
-
-```
-node generate.js
-```
-
-runs, it should automatically:
-
-Create
-
-```
-data/
-```
-
-if it doesn't exist.
-
-Create
-
-```
-output/
-```
-
-if it doesn't exist.
-
-If
-
-```
-data/resume.yml
-```
-
-does not exist
-
-create it automatically using the default template.
-
-If
-
-```
-output/
-```
-
-doesn't exist
-
-create it automatically.
-
-The user should never have to manually create folders.
-
----
-
-# YAML
-
-Use
-
-```
-js-yaml
-```
-
-to parse
-
-```
-data/resume.yml
-```
-
-The schema should support:
-
-```
-personal_information
-
-professional_summary
-
-key_skills
-
-tools_technologies
-
-professional_experience
-
-projects
-
-education
-
-certifications
-
-languages
-
-interests
-```
-
-Use the schema below as the default template.
-
-(paste the YAML schema previously provided)
-
----
-
-# Resume Layout
-
-Design the PDF to closely resemble the attached reference image.
-
-Characteristics:
-
-Single column
-
-Professional ATS format
-
-Minimal whitespace
-
-Blue section headings
-
-Bold name
-
-Compact typography
-
-Everything fits on one page whenever possible
-
-Sections:
-
-Header
-
-Professional Summary
-
-Key Skills
-
-Tools & Technologies
-
-Professional Experience
-
-Projects
-
-Education
-
-Certifications (optional)
-
-No tables.
-
-No icons except very small optional contact icons.
-
-Professional typography.
-
----
-
-# Styling
-
-Use only
-
-```
-@react-pdf/renderer
-```
-
-No HTML.
-
-No CSS.
-
-No browser rendering.
-
-Use StyleSheet.
-
-Font hierarchy
-
-Name
-
-22-24
-
-Section Heading
-
-11-12
-
-Body
-
-9-10
-
-Bullets
-
-8.5-9
-
-Margins around
-
-20
-
-Section heading should have
-
-Blue text
-
-Bold
-
-Horizontal blue line underneath
-
----
-
-# React Components
-
-Split the template into reusable components.
-
-Header
-
-Section
-
-Skills
-
-Tools
-
-Experience
-
-Projects
-
-Education
-
-Resume
-
-Avoid one huge file.
-
----
-
-# Generate Script
-
-generate.js should
-
-Load YAML
-
-Validate data
-
-Create folders
-
-Create missing YAML
-
-Render PDF
-
-Save to
-
-```
-output/resume.pdf
-```
-
-Print
-
-```
-Resume generated successfully!
-```
-
----
-
-# Package.json
-
-Include proper scripts.
-
-```
-npm install
-
-npm run generate
-
-npm start
-```
-
-Dependencies
-
-```
-react
-
-react-dom
-
-@react-pdf/renderer
-
-js-yaml
-
-fs-extra
-
-@babel/core
-
-@babel/node
-
-@babel/preset-env
-
-@babel/preset-react
-```
-
-Configure Babel correctly.
-
----
-
-# Docker
-
-Create a production-ready Dockerfile.
+Quick facts
+- Source YAML: `resume.yml` (root of repository)
+- Icons: `icons/` (optional SVGs: `linkedin.svg`, `github.svg`, `phone.svg`, `location.svg`)
+- Output: `output/resume.pdf`
 
 Requirements
+- Docker (recommended for consistent builds)
+- Or Node.js (>= 22) + npm (for local usage)
 
-Use an official Node LTS image (currently Node 22 LTS unless compatibility requires Node 20 LTS).
+Docker workflow (recommended)
+1. Build the Docker image:
 
-Use a small base image (prefer `node:22-bookworm-slim` or similar).
-
-Install only the libraries required by `@react-pdf/renderer`.
-
-Set
-
-```
-WORKDIR /app
+```bash
+docker build -t resume-generator:latest .
 ```
 
-Copy package files
+2. Run the container to generate the PDF (mount the repo so your `resume.yml` and `icons/` are used):
 
-Install dependencies
+Linux / macOS:
 
-Copy source
-
-Automatically create
-
-```
-data
+```bash
+docker run --rm -v "$(pwd)":/app -w /app resume-generator:latest bash -lc "npm ci && npm run generate"
 ```
 
-and
+PowerShell (Windows):
 
-```
-output
-```
-
-Expose a mounted volume
-
-```
-VOLUME ["/app/data","/app/output"]
+```powershell
+docker run --rm -v ${PWD}:/app -w /app resume-generator:latest powershell -Command "npm ci; npm run generate"
 ```
 
-Default command
+After the command completes the generated PDF will be at `output/resume.pdf` on your host.
 
+Running on a remote machine (EC2, VPS) and downloading `resume.pdf`
+
+Option A — SCP (recommended and secure):
+
+From your local machine (replace `ubuntu` and `<EC2_IP>` with your user and host):
+
+```bash
+scp ubuntu@<EC2_IP>:/home/ubuntu/resume-generator/output/resume.pdf ./
 ```
+
+Option B — Temporary HTTP server (less secure, open only when needed):
+
+On the remote machine (inside the repo):
+
+```bash
+cd output
+python3 -m http.server 8000
+```
+
+Then on your local machine:
+
+```bash
+curl -O http://<EC2_IP>:8000/resume.pdf
+```
+
+Note: For Option B ensure the remote's firewall/security group allows inbound traffic on the chosen port. Use SCP when possible.
+
+Local usage with Node/npm
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Generate the PDF locally:
+
+```bash
 npm run generate
 ```
 
-The container should work like
-
-```bash
-docker build -t resume-generator .
-
-docker run \
--v $(pwd)/data:/app/data \
--v $(pwd)/output:/app/output \
-resume-generator
-```
-
-Every execution should regenerate
+3. Output file:
 
 ```
 output/resume.pdf
 ```
 
-using
+Troubleshooting & tips
+- If `resume.pdf` is locked (``EBUSY``), close any PDF viewer before regenerating.
+- Ensure `icons/` contains the SVGs you expect (the generator embeds them). If icons don't show, make sure the SVGs are self-contained (no external CSS).
+- If running in Docker and you see stale output, re-run the container with the volume mount pointing at the repository root.
+- For CI, build the Docker image and run the `npm run generate` step; collect `output/resume.pdf` as an artifact.
 
-```
-data/resume.yml
-```
+Files ignored by Git
+- `node_modules/`
+- `dist/`
+- `output/`
+- environment files (`.env`)
+- editor folders (`.vscode/`, `.idea/`)
 
-without rebuilding the image.
-
----
-
-# Docker Ignore
-
-Ignore
-
-```
-node_modules
-
-output
-
-.git
-```
-
----
-
-# Git Ignore
-
-Ignore
-
-```
-node_modules
-
-output
-
-.env
-
-npm-debug.log
-```
-
----
-
-# README
-
-Create a detailed README containing
-
-Installation
-
-Local execution
-
-Docker execution
-
-Folder structure
-
-Customizing resume.yml
-
-Generating PDF
-
-Troubleshooting
-
-Example commands
-
----
-
-# Code Quality
-
-Use ES6.
-
-Use async/await.
-
-Handle missing fields gracefully.
-
-Never crash because a YAML field is missing.
-
-Use default values.
-
-Keep the project modular.
-
-Comment major sections.
-
-Use clean architecture.
-
----
-
-# Final Goal
-
-When I clone the repository and run:
-
-```bash
-npm install
-npm run generate
-```
-
-or
-
-```bash
-docker build -t resume-generator .
-
-docker run \
--v ./data:/app/data \
--v ./output:/app/output \
-resume-generator
-```
-
-the application should automatically:
-
-* create missing folders,
-* create a default `resume.yml` if needed,
-* read the YAML,
-* generate `output/resume.pdf`,
-* produce a resume visually similar to the attached reference,
-* and require no manual setup beyond editing `data/resume.yml`.
+If you want a more compact header (icons-only) or different icon tinting, tell me which option and I'll update the components and regenerate the PDF.

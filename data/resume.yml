@@ -1,0 +1,75 @@
+personal_information:
+  full_name: "Your Name"
+  title: "Role | Skills"
+  phone: "+1 (555) 555-5555"
+  email: "you@example.com"
+  location: "City, Country"
+  linkedin:
+    text: "LinkedIn Profile"
+    url: "https://linkedin.com/in/yourprofile"
+
+professional_summary: >
+  Proven professional with experience building modern cloud-native platforms.
+
+key_skills:
+  - Cloud Infrastructure
+  - CI/CD Automation
+  - Kubernetes
+  - Infrastructure as Code
+
+tools_technologies:
+  cloud:
+    - AWS
+    - GCP
+    - Azure
+  containers:
+    - Docker
+    - Kubernetes
+    - Helm
+  infrastructure_as_code:
+    - Terraform
+    - Ansible
+  cicd:
+    - GitHub Actions
+    - Jenkins
+  observability:
+    - Prometheus
+    - Grafana
+  programming:
+    - JavaScript
+    - Python
+    - Bash
+  operating_systems:
+    - Linux
+  version_control:
+    - Git
+    - GitHub
+  databases:
+    - PostgreSQL
+    - MySQL
+
+professional_experience:
+  - company: "Example Company"
+    location: "Remote"
+    duration: "2025 – Present"
+    responsibilities:
+      - "Designed and automated infrastructure using Terraform and CI/CD pipelines."
+      - "Managed containerized applications on Kubernetes clusters."
+
+projects:
+  - title: "Resume PDF Generator"
+    duration: "2025"
+    achievements:
+      - "Built a resume generator using React PDF and YAML input."
+
+education:
+  - degree: "Bachelor of Science"
+    specialization: "Computer Science"
+    institute: "University Name"
+    duration: "2021 – 2025"
+
+certifications: []
+
+languages: []
+
+interests: []

@@ -11,7 +11,9 @@ const __dirname = path.dirname(__filename);
 const dataDir = path.resolve(__dirname, 'data');
 const outputDir = path.resolve(__dirname, 'output');
 const resumeDataPath = path.join(dataDir, 'resume.yml');
+const rootResumePath = path.join(__dirname, 'resume.yml');
 const outputPath = path.join(outputDir, 'resume.pdf');
+const tempOutputPath = path.join(outputDir, 'resume.tmp.pdf');
 
 const defaultResume = `personal_information:
   full_name: "Your Name"
@@ -108,7 +110,8 @@ async function ensureResumeFile() {
 }
 
 async function loadResumeData() {
-  const content = await fs.readFile(resumeDataPath, 'utf8');
+  const sourcePath = await fs.pathExists(rootResumePath) ? rootResumePath : resumeDataPath;
+  const content = await fs.readFile(sourcePath, 'utf8');
   return yaml.load(content) ?? {};
 }
 
@@ -118,7 +121,8 @@ async function writeResumePdf(resumeData) {
 
   // If the renderer exposes renderToFile (Node-friendly API in v4), use it.
   if (typeof ReactPDF.renderToFile === 'function') {
-    await ReactPDF.renderToFile(element, outputPath);
+    await ReactPDF.renderToFile(element, tempOutputPath);
+    await fs.move(tempOutputPath, outputPath, { overwrite: true });
     console.log(`PDF generated at ${outputPath}`);
     return;
   }
@@ -133,9 +137,10 @@ async function writeResumePdf(resumeData) {
     if (doc && typeof doc.toStream === 'function') {
       stream = await doc.toStream();
     } else if (doc && typeof doc.toBuffer === 'function') {
-      // Fallback: write buffer to file
+      // Fallback: write buffer to temp file first.
       const buffer = await doc.toBuffer();
-      await fs.writeFile(outputPath, buffer);
+      await fs.writeFile(tempOutputPath, buffer);
+      await fs.move(tempOutputPath, outputPath, { overwrite: true });
       console.log(`PDF generated at ${outputPath}`);
       return;
     } else {
@@ -158,8 +163,58 @@ async function run() {
     await ensureAppDirectories();
     await ensureResumeFile();
     const rawData = await loadResumeData();
+    // normalize personal information and inject icon data URIs when icons exist
+    const personal = rawData.personal_information ?? {};
+
+    // load any SVGs present in `icons/` and map them by base name
+    const iconsDir = path.join(__dirname, 'icons');
+    const iconsMap = {};
+    try {
+      if (await fs.pathExists(iconsDir)) {
+        const files = await fs.readdir(iconsDir);
+        for (const f of files) {
+          if (f.toLowerCase().endsWith('.svg')) {
+            try {
+              const svg = await fs.readFile(path.join(iconsDir, f), 'utf8');
+              const dataUri = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+              const key = path.basename(f, '.svg').toLowerCase();
+              iconsMap[key] = dataUri;
+            } catch (e) {
+              // ignore individual read errors
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // ignore icon loading errors
+    }
+
+    // debug: list detected icons
+    try {
+      const detected = Object.keys(iconsMap).join(', ');
+      if (detected) console.log('Detected icons:', detected);
+      else console.log('No icons detected in icons/');
+    } catch (e) {}
+
+    // prefer icons from the folder by common keys
+    personal.linkedin = personal.linkedin || {};
+    personal.github = personal.github || {};
+    if (!personal.linkedin.icon) {
+      personal.linkedin.icon = iconsMap['linkedin'] || iconsMap['in'] || undefined;
+    }
+    if (!personal.github.icon) {
+      personal.github.icon = iconsMap['github'] || iconsMap['gh'] || undefined;
+    }
+    // also attach contact icons if provided
+    if (!personal.phone_icon) {
+      personal.phone_icon = iconsMap['phone'] || iconsMap['telephone'] || iconsMap['mobile'] || undefined;
+    }
+    if (!personal.location_icon) {
+      personal.location_icon = iconsMap['location'] || iconsMap['place'] || undefined;
+    }
+
     const resumeData = {
-      personal_information: rawData.personal_information ?? {},
+      personal_information: personal,
       professional_summary: makeSafeString(rawData.professional_summary, ''),
       key_skills: Array.isArray(rawData.key_skills) ? rawData.key_skills : [],
       tools_technologies: rawData.tools_technologies ?? {},

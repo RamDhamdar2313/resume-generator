@@ -8,6 +8,9 @@ personal_information:
   linkedin:
     text: "Prem Mangrulkar"
     url: "https://linkedin.com/in/premmangrulkar"
+  github:
+    text: "Prem Mangrulkar"
+    url: "https://github.com/RamDhamdar2313"
 
 professional_summary: >
   Results-driven DevOps Engineer with 6 months of experience in designing and
@@ -131,10 +134,14 @@ education:
     institute: "Nagpur Institute of Technology, Katol Road"
     duration: "May 2019 – Jul 2022"
 
-certifications: []
+certifications:
+  - Devops and Kubernetes Certificate -- Cloudblitz
 
-languages: []
+languages: 
+  - Hindi
+  - English
+  - Marathi
 
-interests: []
+interests: Reading & Learning new things
 
-references: []
+references: MR. Faltu Aadmi

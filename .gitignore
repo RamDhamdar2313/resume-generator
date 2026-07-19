@@ -1,4 +1,16 @@
 node_modules/
 dist/
-output/resume.pdf
+output/
+.env
+.env.*
 .DS_Store
+.vscode/
+.idea/
+npm-debug.log*
+yarn-error.log*
+*.log
+.cache/
+coverage/
+/.parcel-cache/
+.nyc_output/
+.eslintcache
