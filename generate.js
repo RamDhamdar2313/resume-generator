@@ -118,7 +118,11 @@ async function writeResumePdf(resumeData) {
       data: resumeData
     })
   );
-  await document.toFile(outputPath);
+
+  // Use toBuffer() for Node environments where toFile may not be available.
+  // This writes the generated PDF buffer to the output path.
+  const buffer = await document.toBuffer();
+  await fs.writeFile(outputPath, buffer);
   console.log(`PDF generated at ${outputPath}`);
 }
 
