@@ -119,10 +119,16 @@ async function writeResumePdf(resumeData) {
     })
   );
 
-  // Use toBuffer() for Node environments where toFile may not be available.
-  // This writes the generated PDF buffer to the output path.
-  const buffer = await document.toBuffer();
-  await fs.writeFile(outputPath, buffer);
+  // Use stream output to avoid runtime differences between environments.
+  // `document.toStream()` returns a readable stream we can pipe to a file.
+  const stream = await document.toStream();
+  await new Promise((resolve, reject) => {
+    const writeStream = fs.createWriteStream(outputPath);
+    stream.pipe(writeStream);
+    writeStream.on('finish', resolve);
+    writeStream.on('error', reject);
+    stream.on('error', reject);
+  });
   console.log(`PDF generated at ${outputPath}`);
 }
 
