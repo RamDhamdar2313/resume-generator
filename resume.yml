@@ -1,0 +1,140 @@
+personal_information:
+  full_name: "PREM MANGRULKAR"
+  title: "DevOps Engineer | AWS • Kubernetes • Terraform • Docker • CI/CD • Linux"
+
+  phone: "+91-8149924552"
+  email: "premmangrulkar22@gmail.com"
+  location: "Nagpur, Maharashtra"
+  linkedin:
+    text: "Prem Mangrulkar"
+    url: "https://linkedin.com/in/premmangrulkar"
+
+professional_summary: >
+  Results-driven DevOps Engineer with 6 months of experience in designing and
+  automating cloud infrastructure and software delivery pipelines. Skilled in
+  building scalable platforms that enhance deployment speed and reliability.
+  Expertise in AWS, Kubernetes, Docker, Terraform, and CI/CD automation,
+  focusing on infrastructure as code and container orchestration to optimize
+  workflows and operational efficiency.
+
+key_skills:
+  - Platform Engineering
+  - Cloud Infrastructure
+  - Kubernetes Administration
+  - Infrastructure as Code (IaC)
+  - CI/CD Automation
+  - Cloud-Native Technologies
+  - Microservices Architecture
+  - Distributed Systems
+  - Linux System Administration
+  - Observability & Monitoring
+  - Infrastructure Automation
+  - Networking & Security
+  - Scalability & Reliability Engineering
+  - Incident Management
+  - RCA
+  - Performance Engineering
+  - DevOps
+  - Site Reliability Engineering (SRE)
+  - Agile Development
+
+tools_technologies:
+  cloud:
+    - AWS
+    - EKS
+    - ECS
+    - EC2
+    - VPC
+    - IAM
+    - S3
+    - RDS
+    - CloudWatch
+    - GCP
+
+  containers:
+    - Kubernetes
+    - Docker
+    - Helm
+
+  infrastructure_as_code:
+    - Terraform
+    - Ansible
+
+  cicd:
+    - Jenkins
+    - GitHub Actions
+    - GitLab CI/CD
+
+  observability:
+    - Prometheus
+    - Grafana
+
+  programming:
+    - Python
+    - Bash
+    - Java
+    - JavaScript
+
+  operating_systems:
+    - Linux
+
+  version_control:
+    - Git
+    - GitHub
+    - GitLab
+
+  databases:
+    - PostgreSQL
+    - MySQL
+    - MongoDB
+    - DynamoDB
+
+  networking:
+    - TCP/IP
+    - DNS
+    - HTTP/HTTPS
+    - SSL/TLS
+    - Load Balancing
+
+professional_experience:
+  - company: "DevOps Engineer | Hidar Lab Pvt Ltd"
+    location: "Pune, India"
+    duration: "Jan 2026 – Present"
+
+    responsibilities:
+      - "Automated cloud infrastructure provisioning using Terraform, enabling repeatable and scalable environment deployments."
+      - "Developed and optimized CI/CD pipelines, reducing deployment effort and improving release reliability."
+      - "Managed containerized applications on Kubernetes, focusing on scalability, availability, and operational efficiency."
+      - "Implemented observability solutions leveraging Prometheus, Grafana, and CloudWatch for proactive monitoring and incident detection."
+      - "Strengthened platform security through IAM policies, network segmentation, and infrastructure best practices."
+      - "Partnered with engineering teams to improve deployment strategies, troubleshoot production issues, and enhance system performance."
+      - "Contributed to cloud cost optimization, infrastructure standardization, and platform automation initiatives."
+
+projects:
+  - title: "Project 3 - Tier Architecture Deployment"
+    duration: "Jan 2026 – Present"
+
+    achievements:
+      - "Reduced infrastructure provisioning time by 80% through Terraform-driven Infrastructure as Code (IaC) automation."
+      - "Improved deployment efficiency by 70% and accelerated release cycles through end-to-end CI/CD automation using Jenkins and GitHub Actions."
+      - "Reduced Mean Time To Detect (MTTD) production incidents by 60% through centralized monitoring and alerting with Prometheus, Grafana, and CloudWatch."
+      - "Maintained 99.9% platform availability by implementing automated deployment, monitoring, backup, and recovery strategies."
+
+education:
+  - degree: "Bachelor of Technology (B.Tech)"
+    specialization: "Computer Science"
+    institute: "Tulsiramji Gaikwad Patil College of Engineering & Technology, Mohgaon"
+    duration: "Oct 2022 – Jun 2025"
+
+  - degree: "Diploma"
+    specialization: "Computer Science"
+    institute: "Nagpur Institute of Technology, Katol Road"
+    duration: "May 2019 – Jul 2022"
+
+certifications: []
+
+languages: []
+
+interests: []
+
+references: []
