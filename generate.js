@@ -3,7 +3,7 @@ import fs from 'fs-extra';
 import yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
 import React from 'react';
-import { pdf } from '@react-pdf/renderer';
+import * as ReactPDF from '@react-pdf/renderer';
 import Resume from './dist/Resume.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -113,15 +113,36 @@ async function loadResumeData() {
 }
 
 async function writeResumePdf(resumeData) {
-  const document = pdf(
-    React.createElement(Resume, {
-      data: resumeData
-    })
-  );
+  // Create the element without JSX and attempt to render to a Node stream.
+  const element = React.createElement(Resume, { data: resumeData });
 
-  // Use stream output to avoid runtime differences between environments.
-  // `document.toStream()` returns a readable stream we can pipe to a file.
-  const stream = await document.toStream();
+  // If the renderer exposes renderToFile (Node-friendly API in v4), use it.
+  if (typeof ReactPDF.renderToFile === 'function') {
+    await ReactPDF.renderToFile(element, outputPath);
+    console.log(`PDF generated at ${outputPath}`);
+    return;
+  }
+
+  // Prefer renderer's renderToStream if available (older API), otherwise
+  // use pdf(element).toStream() when supported.
+  let stream;
+  if (typeof ReactPDF.renderToStream === 'function') {
+    stream = await ReactPDF.renderToStream(element);
+  } else {
+    const doc = ReactPDF.pdf ? ReactPDF.pdf(element) : null;
+    if (doc && typeof doc.toStream === 'function') {
+      stream = await doc.toStream();
+    } else if (doc && typeof doc.toBuffer === 'function') {
+      // Fallback: write buffer to file
+      const buffer = await doc.toBuffer();
+      await fs.writeFile(outputPath, buffer);
+      console.log(`PDF generated at ${outputPath}`);
+      return;
+    } else {
+      throw new Error('Renderer does not support stream or buffer output in this environment.');
+    }
+  }
+
   await new Promise((resolve, reject) => {
     const writeStream = fs.createWriteStream(outputPath);
     stream.pipe(writeStream);
